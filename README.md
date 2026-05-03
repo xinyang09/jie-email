@@ -34,6 +34,28 @@ PORT=3000 HOST=127.0.0.1 TEMP_MAIL_BASE_URL=https://your-temp-mail-domain.exampl
 
 打开 [http://127.0.0.1:3000](http://127.0.0.1:3000)。
 
+## Docker 启动
+
+先复制并填写环境变量：
+
+```bash
+cp .env.example .env
+```
+
+容器内需要监听 `0.0.0.0`，`docker-compose.yml` 已经自动设置：
+
+```bash
+docker compose up -d --build
+```
+
+打开 [http://127.0.0.1:3000](http://127.0.0.1:3000)。
+
+停止服务：
+
+```bash
+docker compose down
+```
+
 ## 接口
 
 页面会调用：

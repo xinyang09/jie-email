@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CF 临时邮箱查看器</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="top-bar">
+        <div>
+          <h1>Jie Email</h1>
+        </div>
+        <p id="status" class="status" aria-live="polite"></p>
+      </header>
+
+      <section class="mail-layout" aria-label="临时邮箱三栏视图">
+        <aside class="column mailbox-column" aria-label="邮箱列表">
+          <div class="column-header">
+            <div>
+              <p class="section-label">邮箱</p>
+              <h2>地址列表</h2>
+            </div>
+            <span id="mailbox-count" class="count-badge">0</span>
+          </div>
+
+          <form id="mailbox-form" class="mailbox-form">
+            <label for="address">添加邮箱地址</label>
+            <div class="input-row">
+              <input
+                id="address"
+                name="address"
+                type="email"
+                placeholder="alias@example.com"
+                autocomplete="off"
+                required
+              />
+              <button type="submit">添加</button>
+            </div>
+          </form>
+
+          <div id="mailbox-list" class="mailbox-list"></div>
+        </aside>
+
+        <section class="column summary-column" aria-label="邮件内容缩略">
+          <div class="column-header">
+            <div>
+              <p class="section-label">邮件</p>
+              <h2 id="summary-title">选择邮箱</h2>
+            </div>
+            <button id="refresh-button" class="ghost-button" type="button" disabled>
+              刷新
+            </button>
+          </div>
+          <div id="message-list" class="message-list">
+            <div class="empty-state">先在左侧添加或选择邮箱。</div>
+          </div>
+        </section>
+
+        <article class="column detail-column" aria-label="邮件详情">
+          <div id="detail-empty" class="empty-state detail-empty">
+            选择中间列表中的一封邮件查看详情。
+          </div>
+
+          <section id="detail-panel" class="detail-panel hidden">
+            <header class="detail-header">
+              <div>
+                <p id="matched-address" class="section-label"></p>
+                <h2 id="subject"></h2>
+              </div>
+              <p id="sent-at" class="detail-time"></p>
+            </header>
+
+            <div class="meta-grid">
+              <div class="meta-block">
+                <p class="meta-label">发件人</p>
+                <p id="sender" class="meta-value"></p>
+              </div>
+              <div id="code-panel" class="code-panel hidden">
+                <p class="meta-label">验证码</p>
+                <p id="verification-code" class="verification-code"></p>
+              </div>
+            </div>
+
+            <pre id="message-text" class="message-text"></pre>
+          </section>
+        </article>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

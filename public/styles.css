@@ -205,12 +205,14 @@ h2 {
   font-weight: 900;
 }
 
-.mailbox-form {
+.mailbox-form,
+.order-form {
   padding: 18px;
   border-bottom: 1px solid var(--line);
 }
 
-.mailbox-form label {
+.mailbox-form label,
+.order-form label {
   display: block;
   margin-bottom: 10px;
   color: var(--muted);

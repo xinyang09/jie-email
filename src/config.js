@@ -13,7 +13,10 @@ export const loadAppConfig = (env = process.env) => ({
   port: Number(env.PORT || 3000),
   tempMailBaseUrl: normalizeBaseUrl(env.TEMP_MAIL_BASE_URL),
   tempMailAdminAuth: String(env.TEMP_MAIL_ADMIN_AUTH ?? "").trim(),
-  tempMailSiteAuth: String(env.TEMP_MAIL_SITE_AUTH ?? "").trim()
+  tempMailSiteAuth: String(env.TEMP_MAIL_SITE_AUTH ?? "").trim(),
+  whitelistAuthCode: String(env.WHITELIST_AUTH_CODE ?? "Xinyang666!").trim(),
+  whitelistFilePath: String(env.WHITELIST_FILE_PATH ?? "data/email-whitelist.json").trim(),
+  orderEmailFilePath: String(env.ORDER_EMAIL_FILE_PATH ?? "data/order-email-map.json").trim()
 });
 
 export const validateAppConfig = (config) => {
@@ -23,5 +26,9 @@ export const validateAppConfig = (config) => {
 
   if (!config.tempMailAdminAuth) {
     throw new Error("Missing TEMP_MAIL_ADMIN_AUTH.");
+  }
+
+  if (!config.whitelistAuthCode) {
+    throw new Error("Missing WHITELIST_AUTH_CODE.");
   }
 };

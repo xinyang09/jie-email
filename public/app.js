@@ -3,6 +3,8 @@ import { formatLookupError } from "./clientError.js";
 const STORAGE_KEY = "cf-temp-mail-viewer:mailboxes";
 
 const form = document.querySelector("#mailbox-form");
+const orderForm = document.querySelector("#order-form");
+const orderInput = document.querySelector("#order-id");
 const addressInput = document.querySelector("#address");
 const statusText = document.querySelector("#status");
 const mailboxList = document.querySelector("#mailbox-list");
@@ -23,6 +25,7 @@ const verificationCode = document.querySelector("#verification-code");
 const state = {
   mailboxes: [],
   selectedAddress: "",
+  selectedOrderId: "",
   messagesByAddress: new Map(),
   selectedMessageId: ""
 };
@@ -119,19 +122,24 @@ const renderMailboxes = () => {
 };
 
 const renderMessages = () => {
-  const messages = state.messagesByAddress.get(state.selectedAddress) || [];
+  const activeKey = state.selectedOrderId
+    ? `order:${state.selectedOrderId}`
+    : state.selectedAddress;
+  const messages = state.messagesByAddress.get(activeKey) || [];
 
-  summaryTitle.textContent = state.selectedAddress || "选择邮箱";
-  refreshButton.disabled = !state.selectedAddress;
+  summaryTitle.textContent = state.selectedOrderId
+    ? `订单 ${state.selectedOrderId}`
+    : state.selectedAddress || "选择邮箱";
+  refreshButton.disabled = !state.selectedAddress && !state.selectedOrderId;
 
-  if (!state.selectedAddress) {
-    messageList.innerHTML = '<div class="empty-state">先在左侧添加或选择邮箱。</div>';
+  if (!state.selectedAddress && !state.selectedOrderId) {
+    messageList.innerHTML = '<div class="empty-state">先选择邮箱或输入订单号。</div>';
     hideDetail();
     return;
   }
 
   if (!messages.length) {
-    messageList.innerHTML = '<div class="empty-state">这个邮箱暂无邮件。</div>';
+    messageList.innerHTML = '<div class="empty-state">暂无邮件。</div>';
     hideDetail();
     return;
   }
@@ -195,8 +203,47 @@ const loadMessages = async (address) => {
   }
 };
 
+const loadOrderMessages = async (orderId) => {
+  const normalizedOrderId = orderId.trim();
+
+  if (!normalizedOrderId) {
+    return;
+  }
+
+  setStatus("正在加载订单邮件...", "loading");
+  hideDetail();
+
+  try {
+    const response = await fetch(
+      `/api/order-messages?orderId=${encodeURIComponent(normalizedOrderId)}`
+    );
+    const payload = await response.json();
+    const key = `order:${normalizedOrderId}`;
+
+    if (!response.ok) {
+      state.messagesByAddress.set(key, []);
+      renderMessages();
+      setStatus(formatLookupError({ payload }), "error");
+      return;
+    }
+
+    state.messagesByAddress.set(key, payload.messages || []);
+    state.selectedMessageId = "";
+    renderMessages();
+    setStatus(
+      `订单 ${normalizedOrderId} 已加载 ${payload.messages?.length || 0} 封邮件。`,
+      "success"
+    );
+  } catch (error) {
+    state.messagesByAddress.set(`order:${normalizedOrderId}`, []);
+    renderMessages();
+    setStatus(formatLookupError({ error }), "error");
+  }
+};
+
 const selectMailbox = (address) => {
   state.selectedAddress = address;
+  state.selectedOrderId = "";
   state.selectedMessageId = "";
   renderMailboxes();
   renderMessages();
@@ -224,7 +271,28 @@ form.addEventListener("submit", (event) => {
   addMailbox(addressInput.value);
 });
 
+orderForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const orderId = orderInput.value.trim();
+
+  if (!orderId) {
+    return;
+  }
+
+  state.selectedAddress = "";
+  state.selectedOrderId = orderId;
+  state.selectedMessageId = "";
+  renderMailboxes();
+  renderMessages();
+  loadOrderMessages(orderId);
+});
+
 refreshButton.addEventListener("click", () => {
+  if (state.selectedOrderId) {
+    loadOrderMessages(state.selectedOrderId);
+    return;
+  }
+
   if (state.selectedAddress) {
     loadMessages(state.selectedAddress);
   }

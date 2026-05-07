@@ -12,3 +12,8 @@ services:
       TEMP_MAIL_BASE_URL: ${TEMP_MAIL_BASE_URL}
       TEMP_MAIL_ADMIN_AUTH: ${TEMP_MAIL_ADMIN_AUTH}
       TEMP_MAIL_SITE_AUTH: ${TEMP_MAIL_SITE_AUTH:-}
+      WHITELIST_AUTH_CODE: ${WHITELIST_AUTH_CODE:-Xinyang666!}
+      WHITELIST_FILE_PATH: ${WHITELIST_FILE_PATH:-data/email-whitelist.json}
+      ORDER_EMAIL_FILE_PATH: ${ORDER_EMAIL_FILE_PATH:-data/order-email-map.json}
+    volumes:
+      - ./data:/app/data
